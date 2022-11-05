@@ -1,0 +1,69 @@
+
+@BaseClass = BaseProperties_work_at_a_pizza_place
+[
+	parentname(target_destination) [ group="Hierarchy" ] : "Parent" : : "The name of this entity's parent in the movement hierarchy. Entities with parents move with their parent."
+	parentAttachmentName(parentAttachment) [ group="Hierarchy" ] : "Parent Model Bone/Attachment Name" : : "The name of the bone or attachment to attach to on the entity's parent in the movement hierarchy. Use !bonemerge to use bone-merge style attachment."
+
+	useLocalOffset(boolean) [ group="Hierarchy" ] : "Use Model Attachment offsets" : 0 : "Whether to respect the specified local offset when doing the initial hierarchical attachment to its parent."
+	local.origin(vector) [ group="Hierarchy" ] : "Model Attachment position offset" : : "Offset in the local space of the parent model's attachment/bone to use in hierarchy. Not used if you are not using parent attachment."
+	local.angles(angle) [ group="Hierarchy" ] : "Model Attachment angular offset" : : "Angular offset in the local space of the parent model's attachment/bone to use in hierarchy. Not used if you are not using parent attachment."
+	local.scales(vector) [ group="Hierarchy" ] : "Model Attachment scale" : : "Scale in the local space of the parent model's attachment/bone to use in hierarchy. Not used if you are not using parent attachment."
+
+	targetname(target_source) : "Name" : : "The name that other entities refer to this entity by."
+	tags(tags) : "Tags" : "" : "A list of general purpose tags for this entity, for interactions with other entities such as triggers."
+]
+
+//
+// WorkAtAPizzaPlace.Customer
+//
+@PointClass base(BaseProperties_work_at_a_pizza_place) model() = cashier_customer : "Customer entity for receiving orders. Uses AI Lab code for the customer AI. https://github.com/Facepunch/sbox-ai-lab/blob/master/code/NpcTest.cs"
+[
+	model(resource:vmdl) { report = true hide_when_solid = true }: "World Model" : "models/citizen/citizen.vmdl" : "The model this entity should use."
+	skin(materialgroup) { group = "Rendering" hide_when_solid = true } : "Skin" : "default" : "Some models have multiple versions of their textures, called skins." 
+	bodygroups(bodygroupchoices) { group = "Rendering" hide_when_solid = true } : "Body Groups" : "" : "Some models have multiple variations of certain items, such as characters having different hair styles, etc."
+	order(choices) : "Order" : 0 : "" =
+	[
+		0 : "Pepperoni Pizza"
+		1 : "Sausage Pizza"
+		2 : "Cheese Pizza"
+		3 : "Fizzly"
+		4 : "ORDER COUNT"
+	]
+	timeout(float) : "New Customer Timeout" : 0 : ""
+	enable_shadows(boolean) { group = "Rendering" } : "Shadow Casting" : 1 : "Whether this entity should cast shadows or not"
+
+	input OrderSelected(choices) : "This is called when the customer receives their order. In gameplay, if the order is wrong, the customer will leave the restaurant. If the order is correct, the customer will stay for a bit and the order will go through. The order that the customer received."
+	input SetColor(string) : "Sets the color of this entity. Format is '255 255 255 255'."
+]
+
+//
+// WorkAtAPizzaPlace.CustomerHotspot
+//
+@PointClass base(BaseProperties_work_at_a_pizza_place) = cashier_customerhotspot : "This entity is used as a reference point for the customer to walk to."
+[
+]
+
+//
+// WorkAtAPizzaPlace.CustomerSpawner
+//
+@PointClass base(BaseProperties_work_at_a_pizza_place) = cashier_customerspawner : "This entity is used as a reference point for spawning customers."
+[
+]
+
+//
+// WorkAtAPizzaPlace.OrderPicker
+//
+@PointClass base(BaseProperties_work_at_a_pizza_place) model() = cashier_orderpicker : "This entity is an order station used to take customers' orders."
+[
+	model(resource:vmdl) { report = true hide_when_solid = true }: "World Model" : "models/pizzaplace/orderpicker.vmdl" : "The model this entity should use."
+	skin(materialgroup) { group = "Rendering" hide_when_solid = true } : "Skin" : "default" : "Some models have multiple versions of their textures, called skins." 
+	bodygroups(bodygroupchoices) { group = "Rendering" hide_when_solid = true } : "Body Groups" : "{ base = 1 button1 = 0 button2 = 0 button3 = 0 button4 = 0 }" : "Some models have multiple variations of certain items, such as characters having different hair styles, etc."
+	spawner(string) : "Linked Customer Spawner" :  : ""
+	hotspot(string) : "Linked Customer Hotspot" :  : ""
+	enable_shadows(boolean) { group = "Rendering" } : "Shadow Casting" : 1 : "Whether this entity should cast shadows or not"
+
+	input ClientTakeOrder(choices) : "This method is used whenever the player clicks on the order station. It sends a command to the server to select the customer's order. The order to be selected."
+	input SetCustomer(void) : "This method sets the customer entity linked to this order picker. The customer entity linked to this order picker."
+	input SetColor(string) : "Sets the color of this entity. Format is '255 255 255 255'."
+]
+
